@@ -1,7 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Image, TextInput, Platform } from 'react-native';
-import Animated, { FadeInDown, FadeIn, SlideInRight } from 'react-native-reanimated';
-import { Compass, Users, Calendar, Clock, MapPin, SquareCheck as CheckSquare, CirclePlus as PlusCircle, X, Camera, Award } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Image,
+  TextInput,
+  Platform,
+} from 'react-native';
+import Animated, {
+  FadeInDown,
+  FadeIn,
+  SlideInRight,
+} from 'react-native-reanimated';
+import {
+  Compass,
+  Users,
+  Calendar,
+  Clock,
+  MapPin,
+  SquareCheck as CheckSquare,
+  CirclePlus as PlusCircle,
+  X,
+  Camera,
+  Award,
+} from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '@/constants/Colors';
 import Card from '@/components/Card';
@@ -42,7 +66,7 @@ export default function ExpeditionScreen() {
     realExpeditions: 0,
     simulations: 0,
   });
-  
+
   // Form state with all fields properly initialized
   const [formData, setFormData] = useState<Partial<Expedition>>({
     type: 'real',
@@ -56,15 +80,15 @@ export default function ExpeditionScreen() {
     startDate: new Date().toISOString(),
     photoUri: '',
   });
-  
+
   useEffect(() => {
     loadExpeditions();
   }, []);
-  
+
   useEffect(() => {
     calculateStats();
   }, [expeditions]);
-  
+
   const loadExpeditions = async () => {
     try {
       const stored = await AsyncStorage.getItem('elephant_expeditions');
@@ -75,30 +99,33 @@ export default function ExpeditionScreen() {
       console.error('Error loading expeditions:', error);
     }
   };
-  
+
   const saveExpeditions = async (newExpeditions: Expedition[]) => {
     try {
-      await AsyncStorage.setItem('elephant_expeditions', JSON.stringify(newExpeditions));
+      await AsyncStorage.setItem(
+        'elephant_expeditions',
+        JSON.stringify(newExpeditions)
+      );
       setExpeditions(newExpeditions);
     } catch (error) {
       console.error('Error saving expeditions:', error);
     }
   };
-  
+
   const calculateStats = () => {
     const newStats = {
       total: expeditions.length,
-      completed: expeditions.filter(e => e.status === 'completed').length,
-      inProgress: expeditions.filter(e => e.status === 'in-progress').length,
-      realExpeditions: expeditions.filter(e => e.type === 'real').length,
-      simulations: expeditions.filter(e => e.type === 'simulation').length,
+      completed: expeditions.filter((e) => e.status === 'completed').length,
+      inProgress: expeditions.filter((e) => e.status === 'in-progress').length,
+      realExpeditions: expeditions.filter((e) => e.type === 'real').length,
+      simulations: expeditions.filter((e) => e.type === 'simulation').length,
     };
     setStats(newStats);
   };
-  
+
   const handleSubmit = () => {
     if (!formData.title || !formData.location) return;
-    
+
     const newExpedition: Expedition = {
       id: Date.now().toString(),
       title: formData.title || '',
@@ -112,7 +139,7 @@ export default function ExpeditionScreen() {
       status: formData.status || 'in-progress',
       photoUri: formData.photoUri,
     };
-    
+
     const newExpeditions = [newExpedition, ...expeditions];
     saveExpeditions(newExpeditions);
     setShowForm(false);
@@ -129,309 +156,359 @@ export default function ExpeditionScreen() {
       photoUri: '',
     });
   };
-  
+
   const toggleChecklistItem = (expeditionId: string, taskIndex: number) => {
-    const updatedExpeditions = expeditions.map(expedition => {
+    const updatedExpeditions = expeditions.map((expedition) => {
       if (expedition.id === expeditionId) {
         const updatedChecklist = [...expedition.checklist];
-        updatedChecklist[taskIndex].completed = !updatedChecklist[taskIndex].completed;
+        updatedChecklist[taskIndex].completed =
+          !updatedChecklist[taskIndex].completed;
         return { ...expedition, checklist: updatedChecklist };
       }
       return expedition;
     });
     saveExpeditions(updatedExpeditions);
   };
-  
+
   const toggleExpeditionStatus = (expeditionId: string) => {
-    const updatedExpeditions = expeditions.map(expedition => {
+    const updatedExpeditions = expeditions.map((expedition) => {
       if (expedition.id === expeditionId) {
-        const newStatus = expedition.status === 'completed' ? 'in-progress' : 'completed';
+        const newStatus: 'in-progress' | 'completed' =
+          expedition.status === 'completed' ? 'in-progress' : 'completed';
         return { ...expedition, status: newStatus };
       }
       return expedition;
     });
     saveExpeditions(updatedExpeditions);
   };
-  
-  const filteredExpeditions = expeditions.filter(expedition => {
+
+  const filteredExpeditions = expeditions.filter((expedition) => {
     if (filter === 'all') return true;
     return expedition.type === filter;
   });
-  
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Animated.View
-        entering={FadeInDown.duration(800).springify()}
-        style={styles.header}
+    <View style={styles.container}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Expedition Tracker</Text>
-        <Text style={styles.subtitle}>
-          Log and track your elephant observation journeys
-        </Text>
-      </Animated.View>
-      
-      {!showForm ? (
-        <>
-          <Card style={styles.statsCard}>
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Award size={24} color={Colors.primary} />
-                <Text style={styles.statValue}>{stats.total}</Text>
-                <Text style={styles.statLabel}>Total</Text>
-              </View>
-              <View style={styles.statItem}>
-                <CheckSquare size={24} color={Colors.quaternary} />
-                <Text style={styles.statValue}>{stats.completed}</Text>
-                <Text style={styles.statLabel}>Completed</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Clock size={24} color={Colors.tertiary} />
-                <Text style={styles.statValue}>{stats.inProgress}</Text>
-                <Text style={styles.statLabel}>In Progress</Text>
-              </View>
-            </View>
-          </Card>
-          
-          <View style={styles.filterContainer}>
-            <Button
-              title="All"
-              variant={filter === 'all' ? 'primary' : 'outline'}
-              size="small"
-              onPress={() => setFilter('all')}
-              style={styles.filterButton}
-            />
-            <Button
-              title="Real"
-              variant={filter === 'real' ? 'primary' : 'outline'}
-              size="small"
-              onPress={() => setFilter('real')}
-              style={styles.filterButton}
-            />
-            <Button
-              title="Simulation"
-              variant={filter === 'simulation' ? 'primary' : 'outline'}
-              size="small"
-              onPress={() => setFilter('simulation')}
-              style={styles.filterButton}
-            />
-          </View>
-          
-          {filteredExpeditions.map((expedition, index) => (
-            <Animated.View
-              key={expedition.id}
-              entering={SlideInRight.delay(index * 100).duration(400).springify()}
-            >
-              <Card style={styles.expeditionCard}>
-                <View style={styles.expeditionHeader}>
-                  <View style={styles.expeditionTitleContainer}>
-                    <Text style={styles.expeditionTitle}>{expedition.title}</Text>
-                    <View style={[
-                      styles.typeBadge,
-                      expedition.type === 'simulation' ? styles.simulationBadge : styles.realBadge
-                    ]}>
-                      <Text style={styles.typeBadgeText}>
-                        {expedition.type === 'simulation' ? 'Simulation' : 'Real'}
-                      </Text>
-                    </View>
-                  </View>
-                  <Pressable
-                    style={[
-                      styles.statusBadge,
-                      expedition.status === 'completed' ? styles.completedBadge : styles.inProgressBadge
-                    ]}
-                    onPress={() => toggleExpeditionStatus(expedition.id)}
-                  >
-                    <Text style={styles.statusText}>
-                      {expedition.status === 'completed' ? 'Completed' : 'In Progress'}
-                    </Text>
-                  </Pressable>
-                </View>
-                
-                {expedition.photoUri && (
-                  <Image
-                    source={{ uri: expedition.photoUri }}
-                    style={styles.expeditionImage}
-                  />
-                )}
-                
-                <View style={styles.expeditionDetails}>
-                  <View style={styles.detailRow}>
-                    <MapPin size={16} color={Colors.textSecondary} />
-                    <Text style={styles.detailText}>{expedition.location}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Calendar size={16} color={Colors.textSecondary} />
-                    <Text style={styles.detailText}>
-                      {new Date(expedition.startDate).toLocaleDateString()}
-                    </Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Clock size={16} color={Colors.textSecondary} />
-                    <Text style={styles.detailText}>{expedition.duration}</Text>
-                  </View>
-                  {expedition.teamMembers.length > 0 && (
-                    <View style={styles.detailRow}>
-                      <Users size={16} color={Colors.textSecondary} />
-                      <Text style={styles.detailText}>
-                        {expedition.teamMembers.join(', ')}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-                
-                {expedition.notes && (
-                  <Text style={styles.notes}>{expedition.notes}</Text>
-                )}
-                
-                <View style={styles.checklist}>
-                  <Text style={styles.checklistTitle}>Checklist</Text>
-                  {expedition.checklist.map((item, index) => (
-                    <Pressable
-                      key={index}
-                      style={styles.checklistItem}
-                      onPress={() => toggleChecklistItem(expedition.id, index)}
-                    >
-                      <View style={[
-                        styles.checkbox,
-                        item.completed && styles.checkboxChecked
-                      ]}>
-                        {item.completed && <CheckSquare size={16} color={Colors.accent} />}
-                      </View>
-                      <Text style={[
-                        styles.checklistText,
-                        item.completed && styles.checklistTextCompleted
-                      ]}>
-                        {item.task}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
-              </Card>
-            </Animated.View>
-          ))}
-          
-          <Pressable
-            style={styles.addButton}
-            onPress={() => setShowForm(true)}
-          >
-            <PlusCircle size={24} color="#fff" />
-          </Pressable>
-        </>
-      ) : (
         <Animated.View
-          style={styles.formContainer}
-          entering={FadeIn.duration(300)}
+          entering={FadeInDown.duration(800).springify()}
+          style={styles.header}
         >
-          <View style={styles.formHeader}>
-            <Text style={styles.formTitle}>New Expedition</Text>
-            <Pressable onPress={() => {
-              setShowForm(false);
-              setFormData({
-                type: 'real',
-                checklist: [...defaultChecklist],
-                status: 'in-progress',
-                title: '',
-                location: '',
-                duration: '',
-                teamMembers: [],
-                notes: '',
-                startDate: new Date().toISOString(),
-                photoUri: '',
-              });
-            }}>
-              <X size={24} color={Colors.textSecondary} />
-            </Pressable>
-          </View>
-          
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Type</Text>
-            <View style={styles.typeButtons}>
+          <Text style={styles.title}>Expedition Tracker</Text>
+          <Text style={styles.subtitle}>
+            Log and track your elephant observation journeys
+          </Text>
+        </Animated.View>
+
+        {!showForm ? (
+          <>
+            <Card style={styles.statsCard}>
+              <View style={styles.statsRow}>
+                <View style={styles.statItem}>
+                  <Award size={24} color={Colors.primary} />
+                  <Text style={styles.statValue}>{stats.total}</Text>
+                  <Text style={styles.statLabel}>Total</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <CheckSquare size={24} color={Colors.quaternary} />
+                  <Text style={styles.statValue}>{stats.completed}</Text>
+                  <Text style={styles.statLabel}>Completed</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Clock size={24} color={Colors.tertiary} />
+                  <Text style={styles.statValue}>{stats.inProgress}</Text>
+                  <Text style={styles.statLabel}>In Progress</Text>
+                </View>
+              </View>
+            </Card>
+
+            <View style={styles.filterContainer}>
               <Button
-                title="Real Expedition"
-                variant={formData.type === 'real' ? 'primary' : 'outline'}
+                title="All"
+                variant={filter === 'all' ? 'primary' : 'outline'}
                 size="small"
-                onPress={() => setFormData({ ...formData, type: 'real' })}
-                style={styles.typeButton}
+                onPress={() => setFilter('all')}
+                style={styles.filterButton}
+              />
+              <Button
+                title="Real"
+                variant={filter === 'real' ? 'primary' : 'outline'}
+                size="small"
+                onPress={() => setFilter('real')}
+                style={styles.filterButton}
               />
               <Button
                 title="Simulation"
-                variant={formData.type === 'simulation' ? 'primary' : 'outline'}
+                variant={filter === 'simulation' ? 'primary' : 'outline'}
                 size="small"
-                onPress={() => setFormData({ ...formData, type: 'simulation' })}
-                style={styles.typeButton}
+                onPress={() => setFilter('simulation')}
+                style={styles.filterButton}
               />
             </View>
-          </View>
-          
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Title</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.title}
-              onChangeText={(text) => setFormData({ ...formData, title: text })}
-              placeholder="Enter expedition title"
-              placeholderTextColor={Colors.textSecondary}
+
+            {filteredExpeditions.map((expedition, index) => (
+              <Animated.View
+                key={expedition.id}
+                entering={SlideInRight.delay(index * 100)
+                  .duration(400)
+                  .springify()}
+              >
+                <Card style={styles.expeditionCard}>
+                  <View style={styles.expeditionHeader}>
+                    <View style={styles.expeditionTitleContainer}>
+                      <Text style={styles.expeditionTitle}>
+                        {expedition.title}
+                      </Text>
+                      <View
+                        style={[
+                          styles.typeBadge,
+                          expedition.type === 'simulation'
+                            ? styles.simulationBadge
+                            : styles.realBadge,
+                        ]}
+                      >
+                        <Text style={styles.typeBadgeText}>
+                          {expedition.type === 'simulation'
+                            ? 'Simulation'
+                            : 'Real'}
+                        </Text>
+                      </View>
+                    </View>
+                    <Pressable
+                      style={[
+                        styles.statusBadge,
+                        expedition.status === 'completed'
+                          ? styles.completedBadge
+                          : styles.inProgressBadge,
+                      ]}
+                      onPress={() => toggleExpeditionStatus(expedition.id)}
+                    >
+                      <Text style={styles.statusText}>
+                        {expedition.status === 'completed'
+                          ? 'Completed'
+                          : 'In Progress'}
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  {expedition.photoUri && (
+                    <Image
+                      source={{ uri: expedition.photoUri }}
+                      style={styles.expeditionImage}
+                    />
+                  )}
+
+                  <View style={styles.expeditionDetails}>
+                    <View style={styles.detailRow}>
+                      <MapPin size={16} color={Colors.textSecondary} />
+                      <Text style={styles.detailText}>
+                        {expedition.location}
+                      </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Calendar size={16} color={Colors.textSecondary} />
+                      <Text style={styles.detailText}>
+                        {new Date(expedition.startDate).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Clock size={16} color={Colors.textSecondary} />
+                      <Text style={styles.detailText}>
+                        {expedition.duration}
+                      </Text>
+                    </View>
+                    {expedition.teamMembers.length > 0 && (
+                      <View style={styles.detailRow}>
+                        <Users size={16} color={Colors.textSecondary} />
+                        <Text style={styles.detailText}>
+                          {expedition.teamMembers.join(', ')}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {expedition.notes && (
+                    <Text style={styles.notes}>{expedition.notes}</Text>
+                  )}
+
+                  <View style={styles.checklist}>
+                    <Text style={styles.checklistTitle}>Checklist</Text>
+                    {expedition.checklist.map((item, index) => (
+                      <Pressable
+                        key={index}
+                        style={styles.checklistItem}
+                        onPress={() =>
+                          toggleChecklistItem(expedition.id, index)
+                        }
+                      >
+                        <View
+                          style={[
+                            styles.checkbox,
+                            item.completed && styles.checkboxChecked,
+                          ]}
+                        >
+                          {item.completed && (
+                            <CheckSquare size={16} color={Colors.accent} />
+                          )}
+                        </View>
+                        <Text
+                          style={[
+                            styles.checklistText,
+                            item.completed && styles.checklistTextCompleted,
+                          ]}
+                        >
+                          {item.task}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </Card>
+              </Animated.View>
+            ))}
+
+            <View style={{ height: 80 }} />
+          </>
+        ) : (
+          <Animated.View
+            style={styles.formContainer}
+            entering={FadeIn.duration(300)}
+          >
+            <View style={styles.formHeader}>
+              <Text style={styles.formTitle}>New Expedition</Text>
+              <Pressable
+                onPress={() => {
+                  setShowForm(false);
+                  setFormData({
+                    type: 'real',
+                    checklist: [...defaultChecklist],
+                    status: 'in-progress',
+                    title: '',
+                    location: '',
+                    duration: '',
+                    teamMembers: [],
+                    notes: '',
+                    startDate: new Date().toISOString(),
+                    photoUri: '',
+                  });
+                }}
+              >
+                <X size={24} color={Colors.textSecondary} />
+              </Pressable>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Type</Text>
+              <View style={styles.typeButtons}>
+                <Button
+                  title="Real Expedition"
+                  variant={formData.type === 'real' ? 'primary' : 'outline'}
+                  size="small"
+                  onPress={() => setFormData({ ...formData, type: 'real' })}
+                  style={styles.typeButton}
+                />
+                <Button
+                  title="Simulation"
+                  variant={
+                    formData.type === 'simulation' ? 'primary' : 'outline'
+                  }
+                  size="small"
+                  onPress={() =>
+                    setFormData({ ...formData, type: 'simulation' })
+                  }
+                  style={styles.typeButton}
+                />
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Title</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.title}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, title: text })
+                }
+                placeholder="Enter expedition title"
+                placeholderTextColor={Colors.textSecondary}
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Location</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.location}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, location: text })
+                }
+                placeholder="Enter location"
+                placeholderTextColor={Colors.textSecondary}
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Duration</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.duration}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, duration: text })
+                }
+                placeholder="e.g., 2 days"
+                placeholderTextColor={Colors.textSecondary}
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Team Members (comma-separated)</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.teamMembers?.join(', ')}
+                onChangeText={(text) =>
+                  setFormData({
+                    ...formData,
+                    teamMembers: text.split(',').map((member) => member.trim()),
+                  })
+                }
+                placeholder="Enter team members"
+                placeholderTextColor={Colors.textSecondary}
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Notes</Text>
+              <TextInput
+                style={styles.textArea}
+                value={formData.notes}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, notes: text })
+                }
+                placeholder="Enter expedition notes"
+                placeholderTextColor={Colors.textSecondary}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+
+            <Button
+              title="Save Expedition"
+              onPress={handleSubmit}
+              style={styles.submitButton}
             />
-          </View>
-          
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Location</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.location}
-              onChangeText={(text) => setFormData({ ...formData, location: text })}
-              placeholder="Enter location"
-              placeholderTextColor={Colors.textSecondary}
-            />
-          </View>
-          
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Duration</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.duration}
-              onChangeText={(text) => setFormData({ ...formData, duration: text })}
-              placeholder="e.g., 2 days"
-              placeholderTextColor={Colors.textSecondary}
-            />
-          </View>
-          
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Team Members (comma-separated)</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.teamMembers?.join(', ')}
-              onChangeText={(text) => setFormData({
-                ...formData,
-                teamMembers: text.split(',').map(member => member.trim())
-              })}
-              placeholder="Enter team members"
-              placeholderTextColor={Colors.textSecondary}
-            />
-          </View>
-          
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Notes</Text>
-            <TextInput
-              style={styles.textArea}
-              value={formData.notes}
-              onChangeText={(text) => setFormData({ ...formData, notes: text })}
-              placeholder="Enter expedition notes"
-              placeholderTextColor={Colors.textSecondary}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-          </View>
-          
-          <Button
-            title="Save Expedition"
-            onPress={handleSubmit}
-            style={styles.submitButton}
-          />
-        </Animated.View>
+          </Animated.View>
+        )}
+      </ScrollView>
+      {!showForm && (
+        <Pressable style={styles.addButton} onPress={() => setShowForm(true)}>
+          <PlusCircle size={28} color={Colors.background} />
+        </Pressable>
       )}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -605,19 +682,19 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 16,
     right: 24,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    elevation: 8,
+    shadowColor: Colors.primaryDark,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   formContainer: {
     flex: 1,
