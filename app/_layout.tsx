@@ -4,21 +4,24 @@ import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { View, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
+import { SafeAreaView } from 'react-native';
 
 export default function RootLayout() {
   useFrameworkReady();
 
   return (
-    <View style={styles.container}>
-      <Stack screenOptions={{ 
-        headerShown: false,
-        contentStyle: { backgroundColor: Colors.background },
-      }}>
+    <SafeAreaView style={styles.container}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: Colors.background },
+        }}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -1,5 +1,12 @@
 import React, { ReactNode } from 'react';
-import { Text, StyleSheet, Pressable, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import Colors from '@/constants/Colors';
 
 interface ButtonProps {
@@ -41,21 +48,23 @@ export default function Button({
       {({ pressed }) => (
         <>
           {loading ? (
-            <ActivityIndicator 
-              color={variant === 'outline' ? Colors.primary : Colors.accent} 
-              size="small" 
+            <ActivityIndicator
+              color={variant === 'outline' ? Colors.primary : Colors.accent}
+              size="small"
             />
           ) : (
             <>
               {icon && <span style={{ marginRight: 8 }}>{icon}</span>}
-              <Text style={[
-                styles.text,
-                styles[`${variant}Text`],
-                styles[`${size}Text`],
-                disabled && styles.disabledText,
-                pressed && styles.pressedText,
-                textStyle,
-              ]}>
+              <Text
+                style={[
+                  styles.text,
+                  styles[`${variant}Text`],
+                  styles[`${size}Text`],
+                  disabled && styles.disabledText,
+                  pressed && styles.pressedText,
+                  textStyle,
+                ]}
+              >
                 {title}
               </Text>
             </>
@@ -119,7 +128,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   primaryText: {
-    color: Colors.accent,
+    color: Colors.background,
   },
   secondaryText: {
     color: Colors.accent,

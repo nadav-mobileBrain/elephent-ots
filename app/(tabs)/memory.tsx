@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, Alert } from 'react-native';
-import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Dimensions,
+  Alert,
+} from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { shuffle } from '@/utils/helpers';
 import Colors from '@/constants/Colors';
 import Card from '@/components/Card';
@@ -20,7 +34,7 @@ const items = [
 
 interface GameItem {
   id: number;
-  value: typeof items[number];
+  value: (typeof items)[number];
   flipped: boolean;
   matched: boolean;
 }
@@ -34,22 +48,21 @@ export default function MemoryScreen() {
   const [gameOver, setGameOver] = useState(false);
   const [loading, setLoading] = useState(false);
   const scoreAnimation = useSharedValue(1);
-  
+
   // Setup game board
   const setupGame = () => {
     setLoading(true);
     // Create a pair of each item
-    const allItems = [...items, ...items]
-      .map((item, index) => ({
-        id: index,
-        value: item,
-        flipped: false,
-        matched: false,
-      }));
-    
+    const allItems = [...items, ...items].map((item, index) => ({
+      id: index,
+      value: item,
+      flipped: false,
+      matched: false,
+    }));
+
     // Shuffle items
     const shuffledItems = shuffle(allItems);
-    
+
     // Reset game state
     setGameItems(shuffledItems);
     setSelectedItems([]);
@@ -59,56 +72,59 @@ export default function MemoryScreen() {
     setGameStarted(true);
     setLoading(false);
   };
-  
+
   // Handle card flip
   const handleFlip = (id: number) => {
-    if (selectedItems.length === 2 || 
-        selectedItems.includes(id) || 
-        gameItems[id].matched ||
-        !gameStarted || 
-        gameOver) {
+    if (
+      selectedItems.length === 2 ||
+      selectedItems.includes(id) ||
+      gameItems[id].matched ||
+      !gameStarted ||
+      gameOver
+    ) {
       return;
     }
-    
+
     // Flip the card
     const updatedItems = [...gameItems];
     updatedItems[id].flipped = true;
     setGameItems(updatedItems);
-    
+
     // Add to selection
     const newSelectedItems = [...selectedItems, id];
     setSelectedItems(newSelectedItems);
-    
+
     // If two cards are selected, check for match
     if (newSelectedItems.length === 2) {
-      setMoves(prev => prev + 1);
-      
+      setMoves((prev) => prev + 1);
+
       // Check for match after a short delay
       setTimeout(() => {
         const [first, second] = newSelectedItems;
-        const match = updatedItems[first].value.id === updatedItems[second].value.id;
-        
+        const match =
+          updatedItems[first].value.id === updatedItems[second].value.id;
+
         if (match) {
           // Mark as matched
           updatedItems[first].matched = true;
           updatedItems[second].matched = true;
           const newMatches = matches + 1;
           setMatches(newMatches);
-          
+
           // Animate score
           scoreAnimation.value = withSpring(1.2);
           setTimeout(() => {
             scoreAnimation.value = withSpring(1);
           }, 200);
-          
+
           // Check if game is over
           if (newMatches === items.length) {
             setGameOver(true);
             setTimeout(() => {
               Alert.alert(
-                "Congratulations!",
+                'Congratulations!',
                 `You completed the game in ${moves + 1} moves!`,
-                [{ text: "Play Again", onPress: setupGame }]
+                [{ text: 'Play Again', onPress: setupGame }]
               );
             }, 500);
           }
@@ -117,25 +133,25 @@ export default function MemoryScreen() {
           updatedItems[first].flipped = false;
           updatedItems[second].flipped = false;
         }
-        
+
         setGameItems(updatedItems);
         setSelectedItems([]);
       }, 1000);
     }
   };
-  
+
   // Animated style for score
   const scoreStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: scoreAnimation.value }],
     };
   });
-  
+
   // Calculate grid columns based on screen width
   const screenWidth = Dimensions.get('window').width;
   const gridColumns = screenWidth > 500 ? 4 : 3;
   const cardSize = (screenWidth - 64) / gridColumns;
-  
+
   return (
     <View style={styles.container}>
       <Card style={styles.scoreCard}>
@@ -146,18 +162,21 @@ export default function MemoryScreen() {
           </View>
           <Animated.View style={[styles.scoreItem, scoreStyle]}>
             <Text style={styles.scoreLabel}>Matches</Text>
-            <Text style={[styles.scoreValue, styles.matchesValue]}>{matches}/{items.length}</Text>
+            <Text style={[styles.scoreValue, styles.matchesValue]}>
+              {matches}/{items.length}
+            </Text>
           </Animated.View>
         </View>
       </Card>
-      
+
       {!gameStarted ? (
         <View style={styles.startContainer}>
           <Text style={styles.gameTitle}>Elephant Memory Game</Text>
           <Text style={styles.gameDescription}>
-            Test your memory by matching pairs of elephant journey items. Find all matches with the fewest moves!
+            Test your memory by matching pairs of elephant journey items. Find
+            all matches with the fewest moves!
           </Text>
-          <Button 
+          <Button
             onPress={setupGame}
             title="Start Game"
             loading={loading}
@@ -165,15 +184,20 @@ export default function MemoryScreen() {
           />
         </View>
       ) : (
-        <View style={[styles.gameGrid, { width: cardSize * gridColumns + (gridColumns - 1) * 8 }]}>
+        <View
+          style={[
+            styles.gameGrid,
+            { width: cardSize * gridColumns + (gridColumns - 1) * 8 },
+          ]}
+        >
           {gameItems.map((item, index) => (
-            <Animated.View 
+            <Animated.View
               key={index}
               entering={FadeIn.delay(index * 50).duration(300)}
               exiting={FadeOut.duration(300)}
               style={[
-                styles.card, 
-                { width: cardSize - 8, height: cardSize - 8 }
+                styles.card,
+                { width: cardSize - 8, height: cardSize - 8 },
               ]}
             >
               <Pressable
@@ -181,7 +205,7 @@ export default function MemoryScreen() {
                   styles.cardInner,
                   item.flipped && styles.cardFlipped,
                   item.matched && styles.cardMatched,
-                  pressed && styles.cardPressed
+                  pressed && styles.cardPressed,
                 ]}
                 onPress={() => handleFlip(index)}
                 disabled={item.flipped || item.matched}
@@ -201,11 +225,11 @@ export default function MemoryScreen() {
           ))}
         </View>
       )}
-      
+
       {gameStarted && !gameOver && (
         <View style={styles.buttonContainer}>
-          <Button 
-            onPress={setupGame} 
+          <Button
+            onPress={setupGame}
             title="Restart Game"
             variant="secondary"
           />

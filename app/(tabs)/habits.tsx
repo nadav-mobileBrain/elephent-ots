@@ -1,6 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { ArrowLeft, Share2, Repeat, Circle as XCircle, ClipboardList, ChevronRight } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Share2,
+  Repeat,
+  Circle as XCircle,
+  ClipboardList,
+  ChevronRight,
+} from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/Colors';
@@ -12,26 +19,26 @@ const habitPresets = [
     id: 'trending',
     title: 'Habits in trend',
     subtitle: 'Move Fast, Stay Relevant',
-    icon: <Repeat size={24} color={Colors.primary} />
+    icon: <Repeat size={24} color={Colors.primary} />,
   },
   {
     id: 'essential',
     title: 'Essential habits',
     subtitle: 'Simplicity Sparks Daily Joy',
-    icon: <ClipboardList size={24} color={Colors.primary} />
+    icon: <ClipboardList size={24} color={Colors.primary} />,
   },
   {
     id: 'stress',
     title: 'Ease stress',
     subtitle: 'Breaks Build Better You',
-    icon: <XCircle size={24} color={Colors.primary} />
+    icon: <XCircle size={24} color={Colors.primary} />,
   },
   {
     id: 'morning',
     title: 'Good morning',
     subtitle: 'Start Strong, Shine Bright',
-    icon: <Share2 size={24} color={Colors.primary} />
-  }
+    icon: <Share2 size={24} color={Colors.primary} />,
+  },
 ];
 
 export default function HabitsScreen() {
@@ -43,12 +50,12 @@ export default function HabitsScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      
+
       {/* Animated leaves */}
       {Array.from({ length: 5 }).map((_, i) => (
-        <LeafAnimation 
-          key={i} 
-          delay={i * 2000} 
+        <LeafAnimation
+          key={i}
+          delay={i * 2000}
           duration={3000 + i * 500}
           size={16 + Math.random() * 16}
         />
@@ -67,7 +74,7 @@ export default function HabitsScreen() {
 
       {/* Habit Types */}
       <View style={styles.habitTypes}>
-        <Animated.View 
+        <Animated.View
           entering={FadeInDown.delay(100).duration(400)}
           style={styles.habitTypeRow}
         >
@@ -95,17 +102,15 @@ export default function HabitsScreen() {
         {/* Presets Section */}
         <Animated.View entering={FadeInDown.delay(300).duration(400)}>
           <Text style={styles.presetsTitle}>Or Choose From Presets</Text>
-          
+
           {habitPresets.map((preset, index) => (
-            <Animated.View 
+            <Animated.View
               key={preset.id}
               entering={FadeInDown.delay(400 + index * 100).duration(400)}
             >
               <Card style={styles.presetButton}>
                 <View style={styles.presetContent}>
-                  <View style={styles.presetIcon}>
-                    {preset.icon}
-                  </View>
+                  <View style={styles.presetIcon}>{preset.icon}</View>
                   <View style={styles.presetText}>
                     <Text style={styles.presetTitle}>{preset.title}</Text>
                     <Text style={styles.presetSubtitle}>{preset.subtitle}</Text>
@@ -179,7 +184,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.primaryLight,
   },
   createButtonText: {
-    color: Colors.accent,
+    color: Colors.secondary,
     fontSize: 16,
     fontWeight: '600',
   },

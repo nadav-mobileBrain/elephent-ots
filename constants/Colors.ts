@@ -9,7 +9,7 @@ export default {
   tertiary: '#383838', // Slightly lighter gray
   quaternary: '#444444', // Even lighter gray
   quinary: '#505050', // Lightest gray
-  accent: '#9FE870', // Neon green
+  accent: '#7AC754', // Neon green
   accentTransparent: 'rgba(159, 232, 112, 0.1)',
   background: '#1A1A1A', // Very dark gray/black
   backgroundSecondary: '#242424', // Slightly lighter background
