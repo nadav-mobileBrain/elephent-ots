@@ -5,10 +5,11 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { View, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import { SafeAreaView } from 'react-native';
+import { useCheckUpdates } from '@/hooks/useCheckForUpdates';
 
 export default function RootLayout() {
   useFrameworkReady();
-
+  useCheckUpdates();
   return (
     <SafeAreaView style={styles.container}>
       <Stack
