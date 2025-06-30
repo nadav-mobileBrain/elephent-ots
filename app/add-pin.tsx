@@ -5,52 +5,41 @@ import {
   TextInput,
   StyleSheet,
   Pressable,
-  Image,
+  Alert,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as SQLite from 'expo-sqlite';
 import Colors from '@/constants/Colors';
-import { Camera } from 'lucide-react-native';
+import { Leaf } from 'lucide-react-native';
 
 const db = SQLite.openDatabaseSync('elephant_map.db');
 
 export default function AddPinScreen() {
   const router = useRouter();
+  const { x, y } = useLocalSearchParams<{ x: string; y: string }>();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [herdSize, setHerdSize] = useState('');
-  const [image, setImage] = useState<string | null>(null);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const handleSave = () => {
-    if (!title || !description) {
-      alert('Please fill in all fields.');
+  const handleSave = async () => {
+    if (!title || !x || !y) {
+      Alert.alert('Error', 'Title is required.');
       return;
     }
 
-    // For simplicity, we'll use a fixed location for new pins.
-    // In a real app, you'd get this from the map view.
-    const latitude = -1.3;
-    const longitude = 36.82;
+    const herdSizeNumber = parseInt(herdSize, 10) || 0;
+    const posX = parseFloat(x);
+    const posY = parseFloat(y);
 
-    db.execSync(
-      `INSERT INTO pins (latitude, longitude, title, description, photo, herdSize, date) VALUES (${latitude}, ${longitude}, "${title}", "${description}", "${image}", ${parseInt(
-        herdSize,
-        10
-      )}, "${new Date().toISOString()}");`
+    await db.runAsync(
+      'INSERT INTO pins (x, y, title, description, herdSize, date) VALUES (?, ?, ?, ?, ?, ?)',
+      posX,
+      posY,
+      title,
+      description,
+      herdSizeNumber,
+      new Date().toISOString()
     );
 
     router.back();
@@ -58,45 +47,35 @@ export default function AddPinScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add a New Sighting</Text>
+      <Text style={styles.header}>Add New Sighting</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Sighting Title (e.g., 'Near the river')"
-        placeholderTextColor={Colors.textSecondary}
+        placeholder="Sighting Title (e.g., 'Near the Baobab Tree')"
         value={title}
         onChangeText={setTitle}
+        placeholderTextColor="#999"
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, styles.multiline]}
         placeholder="Description"
-        placeholderTextColor={Colors.textSecondary}
         value={description}
         onChangeText={setDescription}
         multiline
+        placeholderTextColor="#999"
       />
       <TextInput
         style={styles.input}
-        placeholder="Herd Size (e.g., 15)"
-        placeholderTextColor={Colors.textSecondary}
+        placeholder="Herd Size (e.g., 5)"
         value={herdSize}
         onChangeText={setHerdSize}
         keyboardType="numeric"
+        placeholderTextColor="#999"
       />
 
-      <Pressable style={styles.imagePicker} onPress={pickImage}>
-        {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
-        ) : (
-          <>
-            <Camera color={Colors.primary} size={32} />
-            <Text style={styles.imagePickerText}>Add Photo</Text>
-          </>
-        )}
-      </Pressable>
-
-      <Pressable style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save Sighting</Text>
+      <Pressable style={styles.button} onPress={handleSave}>
+        <Leaf color={Colors.background} size={24} />
+        <Text style={styles.buttonText}>Save Sighting</Text>
       </Pressable>
     </View>
   );
@@ -105,52 +84,40 @@ export default function AddPinScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     padding: 20,
-    paddingTop: 50,
+    backgroundColor: Colors.background,
   },
-  title: {
+  header: {
     fontSize: 28,
     fontWeight: 'bold',
     color: Colors.text,
-    textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   input: {
-    backgroundColor: Colors.card,
-    color: Colors.text,
+    borderWidth: 1,
+    borderColor: '#ddd',
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
     marginBottom: 15,
+    backgroundColor: '#fff',
   },
-  imagePicker: {
-    backgroundColor: Colors.card,
-    borderRadius: 10,
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
+  multiline: {
+    height: 100,
+    textAlignVertical: 'top',
   },
-  imagePickerText: {
-    color: Colors.primary,
-    marginTop: 8,
-    fontSize: 16,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
-  },
-  saveButton: {
+  button: {
     backgroundColor: Colors.primary,
-    padding: 20,
-    borderRadius: 16,
+    padding: 18,
+    borderRadius: 10,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
-  saveButtonText: {
+  buttonText: {
     color: Colors.background,
     fontSize: 18,
     fontWeight: 'bold',
+    marginLeft: 10,
   },
 });

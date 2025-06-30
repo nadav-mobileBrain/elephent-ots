@@ -2,8 +2,10 @@
   "expo": {
     "name": "elephant-mobile",
     "slug": "elephant-mobile",
-    "version": "1.4.0",
-    "runtimeVersion": "1.4.0",
+    "version": "1.5.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -20,8 +22,7 @@
       "buildType": "release",
       "prebuildCommand": "npm install --legacy-peer-deps",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSLocationWhenInUseUsageDescription": "We need your location to show you where you are on the map and to accurately place your elephant sighting pins."
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "web": {

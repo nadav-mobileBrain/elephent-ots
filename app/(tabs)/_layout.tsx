@@ -9,6 +9,7 @@ import {
   ListTodo,
   Map,
   BookCopy,
+  BookOpenText,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
@@ -69,30 +70,17 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="journal"
-          options={{
-            title: 'Ele-log',
-            tabBarIcon: ({ color, size }) => (
-              <BookOpen size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="guides"
           options={{
             title: 'Guides',
-            tabBarIcon: ({ color, size }) => (
-              <CalendarDays size={size} color={color} />
-            ),
+            tabBarIcon: ({ color }) => <Compass color={color} />,
           }}
         />
         <Tabs.Screen
           name="stories"
           options={{
             title: 'Stories',
-            tabBarIcon: ({ color, size }) => (
-              <BookCopy size={size} color={color} />
-            ),
+            tabBarIcon: ({ color }) => <BookOpenText color={color} />,
           }}
         />
         <Tabs.Screen
