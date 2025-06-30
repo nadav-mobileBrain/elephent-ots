@@ -1,12 +1,21 @@
 import { Tabs } from 'expo-router';
 import { Platform, StyleSheet, View } from 'react-native';
-import { ChartGantt as Elephant, BookOpen, CalendarDays, Brain, Compass, ListTodo } from 'lucide-react-native';
+import {
+  ChartGantt as Elephant,
+  BookOpen,
+  CalendarDays,
+  Brain,
+  Compass,
+  ListTodo,
+  Map,
+  BookCopy,
+} from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
-  
+
   return (
     <View style={StyleSheet.absoluteFill}>
       <Tabs
@@ -17,53 +26,80 @@ export default function TabLayout() {
             ...styles.tabBar,
             paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0,
           },
-          tabBarBackground: () => (
-            <View style={styles.tabBarBackground} />
-          ),
+          tabBarBackground: () => <View style={styles.tabBarBackground} />,
           tabBarLabelStyle: styles.tabBarLabel,
           tabBarItemStyle: styles.tabBarItem,
           headerShown: false,
-        }}>
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color, size }) => <Elephant size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Elephant size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="memory"
           options={{
             title: 'Memory',
-            tabBarIcon: ({ color, size }) => <Brain size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Brain size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="expedition"
           options={{
             title: 'Expeditions',
-            tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Compass size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="habits"
           options={{
             title: 'Habits',
-            tabBarIcon: ({ color, size }) => <ListTodo size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <ListTodo size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="journal"
           options={{
             title: 'Ele-log',
-            tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <BookOpen size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
-          name="guide"
+          name="guides"
           options={{
-            title: 'Guide',
-            tabBarIcon: ({ color, size }) => <CalendarDays size={size} color={color} />,
+            title: 'Guides',
+            tabBarIcon: ({ color, size }) => (
+              <CalendarDays size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="stories"
+          options={{
+            title: 'Stories',
+            tabBarIcon: ({ color, size }) => (
+              <BookCopy size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="map"
+          options={{
+            title: 'Map',
+            tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
           }}
         />
       </Tabs>

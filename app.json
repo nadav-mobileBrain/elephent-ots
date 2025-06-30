@@ -3,9 +3,7 @@
     "name": "elephant-mobile",
     "slug": "elephant-mobile",
     "version": "1.4.0",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.4.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -22,7 +20,8 @@
       "buildType": "release",
       "prebuildCommand": "npm install --legacy-peer-deps",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "We need your location to show you where you are on the map and to accurately place your elephant sighting pins."
       }
     },
     "web": {
@@ -41,6 +40,9 @@
       "eas": {
         "projectId": "2a60e082-d541-4db8-ab42-a5d8eb753d1e"
       }
+    },
+    "android": {
+      "package": "com.elephantmobile.mccrudy"
     }
   }
 }
