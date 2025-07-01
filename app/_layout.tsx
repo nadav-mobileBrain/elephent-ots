@@ -19,6 +19,13 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="add-pin"
+          options={{
+            headerShown: false, // We're handling header in the component itself
+            presentation: 'modal',
+          }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />

@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View, Dimensions } from 'react-native';
 import {
   ChartGantt as Elephant,
   BookOpen,
@@ -14,6 +14,10 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 
+// Get screen dimensions for responsive design
+const { width: screenWidth } = Dimensions.get('window');
+const isTablet = screenWidth >= 768;
+
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
@@ -26,10 +30,29 @@ export default function TabLayout() {
           tabBarStyle: {
             ...styles.tabBar,
             paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0,
+            height:
+              Platform.OS === 'ios'
+                ? isTablet
+                  ? 100
+                  : 90
+                : isTablet
+                ? 80
+                : 60,
           },
           tabBarBackground: () => <View style={styles.tabBarBackground} />,
-          tabBarLabelStyle: styles.tabBarLabel,
-          tabBarItemStyle: styles.tabBarItem,
+          tabBarLabelStyle: {
+            ...styles.tabBarLabel,
+            fontSize: isTablet ? 14 : 12,
+          },
+          tabBarItemStyle: {
+            ...styles.tabBarItem,
+            height:
+              Platform.OS === 'ios' ? (isTablet ? 70 : 50) : isTablet ? 80 : 60,
+            paddingTop: Platform.OS === 'ios' ? (isTablet ? 15 : 10) : 0,
+          },
+          tabBarIconStyle: {
+            marginBottom: isTablet ? 4 : 2,
+          },
           headerShown: false,
         }}
       >
@@ -38,7 +61,7 @@ export default function TabLayout() {
           options={{
             title: 'Home',
             tabBarIcon: ({ color, size }) => (
-              <Elephant size={size} color={color} />
+              <Elephant size={isTablet ? size + 4 : size} color={color} />
             ),
           }}
         />
@@ -47,7 +70,7 @@ export default function TabLayout() {
           options={{
             title: 'Memory',
             tabBarIcon: ({ color, size }) => (
-              <Brain size={size} color={color} />
+              <Brain size={isTablet ? size + 4 : size} color={color} />
             ),
           }}
         />
@@ -56,7 +79,7 @@ export default function TabLayout() {
           options={{
             title: 'Expeditions',
             tabBarIcon: ({ color, size }) => (
-              <Compass size={size} color={color} />
+              <Compass size={isTablet ? size + 4 : size} color={color} />
             ),
           }}
         />
@@ -65,7 +88,7 @@ export default function TabLayout() {
           options={{
             title: 'Habits',
             tabBarIcon: ({ color, size }) => (
-              <ListTodo size={size} color={color} />
+              <ListTodo size={isTablet ? size + 4 : size} color={color} />
             ),
           }}
         />
@@ -73,21 +96,27 @@ export default function TabLayout() {
           name="guides"
           options={{
             title: 'Guides',
-            tabBarIcon: ({ color }) => <Compass color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Compass size={isTablet ? size + 4 : size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="stories"
           options={{
             title: 'Stories',
-            tabBarIcon: ({ color }) => <BookOpenText color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <BookOpenText size={isTablet ? size + 4 : size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="map"
           options={{
             title: 'Map',
-            tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Map size={isTablet ? size + 4 : size} color={color} />
+            ),
           }}
         />
       </Tabs>

@@ -8,9 +8,10 @@ import {
   Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SQLite from 'expo-sqlite';
 import Colors from '@/constants/Colors';
-import { Leaf } from 'lucide-react-native';
+import { Leaf, ArrowLeft, X } from 'lucide-react-native';
 
 const db = SQLite.openDatabaseSync('elephant_map.db');
 
@@ -45,39 +46,86 @@ export default function AddPinScreen() {
     router.back();
   };
 
+  const handleCancel = () => {
+    Alert.alert(
+      'Discard Changes?',
+      'Are you sure you want to discard your new sighting?',
+      [
+        { text: 'Keep Editing', style: 'cancel' },
+        { text: 'Discard', style: 'destructive', onPress: () => router.back() },
+      ]
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Add New Sighting</Text>
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: 'New Sighting',
+          headerStyle: {
+            backgroundColor: Colors.background,
+          },
+          headerTintColor: Colors.text,
+          headerTitleStyle: {
+            color: Colors.text,
+            fontSize: 18,
+            fontWeight: 'bold',
+          },
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.back()}
+              style={styles.headerButton}
+            >
+              <ArrowLeft size={24} color={Colors.primary} />
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable onPress={handleCancel} style={styles.headerButton}>
+              <X size={24} color={Colors.textSecondary} />
+            </Pressable>
+          ),
+        }}
+      />
+      <View style={styles.container}>
+        <Text style={styles.header}>Add New Sighting</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Sighting Title (e.g., 'Near the Baobab Tree')"
-        value={title}
-        onChangeText={setTitle}
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={[styles.input, styles.multiline]}
-        placeholder="Description"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Herd Size (e.g., 5)"
-        value={herdSize}
-        onChangeText={setHerdSize}
-        keyboardType="numeric"
-        placeholderTextColor="#999"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Sighting Title (e.g., 'Near the Baobab Tree')"
+          value={title}
+          onChangeText={setTitle}
+          placeholderTextColor="#999"
+        />
+        <TextInput
+          style={[styles.input, styles.multiline]}
+          placeholder="Description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          placeholderTextColor="#999"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Herd Size (e.g., 5)"
+          value={herdSize}
+          onChangeText={setHerdSize}
+          keyboardType="numeric"
+          placeholderTextColor="#999"
+        />
 
-      <Pressable style={styles.button} onPress={handleSave}>
-        <Leaf color={Colors.background} size={24} />
-        <Text style={styles.buttonText}>Save Sighting</Text>
-      </Pressable>
-    </View>
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.cancelButton} onPress={handleCancel}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </Pressable>
+
+          <Pressable style={styles.saveButton} onPress={handleSave}>
+            <Leaf color={Colors.background} size={24} />
+            <Text style={styles.saveButtonText}>Save Sighting</Text>
+          </Pressable>
+        </View>
+      </View>
+    </>
   );
 }
 
@@ -106,7 +154,27 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
-  button: {
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 20,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: Colors.card,
+    padding: 18,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.textSecondary,
+  },
+  cancelButtonText: {
+    color: Colors.textSecondary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  saveButton: {
+    flex: 2,
     backgroundColor: Colors.primary,
     padding: 18,
     borderRadius: 10,
@@ -114,10 +182,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  buttonText: {
+  saveButtonText: {
     color: Colors.background,
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  headerButton: {
+    padding: 8,
+    borderRadius: 8,
   },
 });
